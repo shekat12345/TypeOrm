@@ -4,10 +4,13 @@
  *
  * @format
  */
-
-import React from 'react';
+import 'reflect-metadata';
+import axios from 'axios';
+import React, {useEffect, useState} from 'react';
 import type {PropsWithChildren} from 'react';
+import {Actionerr} from './tester.js'
 import {
+  Button,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -24,11 +27,39 @@ import {
   LearnMoreLinks,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
+import {AppDataSource} from './orrm/database';
+import { AppDataSource1 } from './orrm/tutorials/dataBAse2.js';
+import {Author} from './orrm/entities/Author';
+import {Post} from './orrm/entities/Post';
+import {Erf} from './orrm/tutorials';
 
 type SectionProps = PropsWithChildren<{
   title: string;
 }>;
+function divideArrayIntoChunks<T>(array: T[], chunkSize: number): T[][] {
+  const chunks: T[][] = [];
+  for (let i = 0; i < array.length; i += chunkSize) {
+    chunks.push(array.slice(i, i + chunkSize));
+  }
+  return chunks;
+}
+function decodeToOriginalArray(dataHelper: { [key: string]: string }): string[] {
+  let originalArray: string[] = [];
+  Object.keys(dataHelper)
+    .sort((a, b) => Number(a) - Number(b)) 
+    .forEach(key => {
+      const chunk = JSON.parse(dataHelper[key]);
+      originalArray = originalArray.concat(chunk);
+    });
+  return originalArray;
+}
 
+
+const Actioner = () => {
+  const chunkSize = 5;
+  const dividedArrays = divideArrayIntoChunks(characters, chunkSize);
+  console.log(dividedArrays);
+};
 function Section({children, title}: SectionProps): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
   return (
@@ -57,10 +88,48 @@ function Section({children, title}: SectionProps): React.JSX.Element {
 
 function App(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
+  const [posts, setPosts] = useState([]);
+  const [initer, setIniter] = useState(false);
+
+const Action=()=>{
+  AppDataSource1.initialize().then(()=>{
+    alert ("heoeoeoeo")
+  }).catch((err)=>{
+    alert (err)
+  })
+}
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
+  useEffect(() => {
+    if (!initer) {
+      AppDataSource.initialize()
+        .then(() => {
+          setIniter(true);
+          // alert('Database initialized successfully!');
+        })
+        .catch(error => console.error('Error initializing database:', error));
+      return () => {
+        AppDataSource.destroy();
+      };
+    }
+  }, []);
+  const getPosts = async () => {
+    if (initer) {
+      try {
+        const postsRepo = AppDataSource.getRepository(Post);
+        const posts = await postsRepo.find();
+        setPosts(posts);
+        alert(JSON.stringify(posts));
+      } catch (error) {
+        alert(error);
+      }
+    }
+  };
+  useEffect(() => {
+    getPosts();
+  }, [initer]);
 
   return (
     <SafeAreaView style={backgroundStyle}>
@@ -68,33 +137,82 @@ function App(): React.JSX.Element {
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor={backgroundStyle.backgroundColor}
       />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
+      <Button
+        title="Get Authors "
+        onPress={async () => {
+          // axios
+          //   .post('http://192.168.10.53:3000/posts', {
+          //     title: 'My First Post',
+          //     content: 'This is the content of my first post.',
+          //     authorId: 1,
+          //   })
+          //   .then(response => {
+          //     alert(JSON.stringify(response.data));
+          //   })
+          //   .catch(error => {
+          //     alert(error.message); // Log the error message
+          //     console.error('Error details:', error.response?.data || error);
+          //   });
+
+          const authorRepo = AppDataSource.getRepository(Author);
+          const authors = await authorRepo.find();
+          // let erf = JSON.stringify(authorRepo)
+          console.log(authors);
+          // axios.get('http://192.168.10.53:3000/authors').then((e)=>{
+          //   alert (JSON.stringify(e))
+          // }).catch((er)=>{alert (er)})
+        }}
+      />
+      <Button
+        title="Get Posts"
+        onPress={async () => {
+          const authorRepo = AppDataSource.getRepository(Post);
+          const authors = await authorRepo.find();
+          // let erf = JSON.stringify(authorRepo)
+          console.log(authors);
+        }}
+      />
+      <Button
+        title="Create Post"
+        onPress={async () => {
+          try {
+            const postRepo = AppDataSource.getRepository(Post);
+            const newPost = postRepo.create({
+              title: 'hello',
+              content: 'hellll',
+              author: 1,
+            });
+            await postRepo.save(newPost);
+            alert('hello ');
+          } catch (error) {
+            alert(error);
+          }
+        }}
+      />
+      <Button
+        title="Create an Author "
+        onPress={async () => {
+          try {
+            const authorRepo = AppDataSource.getRepository(Author);
+            const newAuthor = authorRepo.create({name: 'user name 1'});
+            await authorRepo.save(newAuthor);
+            alert('hello ');
+          } catch (error) {
+            alert(error);
+          }
+        }}
+      />
+      <View>
+        <Text>{JSON.stringify(posts)}</Text>
+      </View>
+      <Button onPress={()=>{
+
+      Action()
+
+      }} title='Std'/>
     </SafeAreaView>
   );
-}
+}//jesd
 
 const styles = StyleSheet.create({
   sectionContainer: {

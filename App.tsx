@@ -8,7 +8,7 @@ import 'reflect-metadata';
 import axios from 'axios';
 import React, {useEffect, useState} from 'react';
 import type {PropsWithChildren} from 'react';
-import {Actionerr} from './tester.js'
+import {Actionerr} from './tester.js';
 import {
   Button,
   SafeAreaView,
@@ -19,7 +19,7 @@ import {
   useColorScheme,
   View,
 } from 'react-native';
-
+import { getManager } from 'typeorm';
 import {
   Colors,
   DebugInstructions,
@@ -28,10 +28,12 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 import {AppDataSource} from './orrm/database';
-import { AppDataSource1 } from './orrm/tutorials/dataBAse2.js';
+import {AppDataSource1} from './orrm/tutorials/dataBAse2.js';
 import {Author} from './orrm/entities/Author';
 import {Post} from './orrm/entities/Post';
 import {Erf} from './orrm/tutorials';
+import Student from './orrm/tutorials/entities/students.js';
+import {Customer} from './orrm/tutorials/entities/Cutsomer.ts';
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -43,17 +45,16 @@ function divideArrayIntoChunks<T>(array: T[], chunkSize: number): T[][] {
   }
   return chunks;
 }
-function decodeToOriginalArray(dataHelper: { [key: string]: string }): string[] {
+function decodeToOriginalArray(dataHelper: {[key: string]: string}): string[] {
   let originalArray: string[] = [];
   Object.keys(dataHelper)
-    .sort((a, b) => Number(a) - Number(b)) 
+    .sort((a, b) => Number(a) - Number(b))
     .forEach(key => {
       const chunk = JSON.parse(dataHelper[key]);
       originalArray = originalArray.concat(chunk);
     });
   return originalArray;
 }
-
 
 const Actioner = () => {
   const chunkSize = 5;
@@ -91,27 +92,26 @@ function App(): React.JSX.Element {
   const [posts, setPosts] = useState([]);
   const [initer, setIniter] = useState(false);
 
-const Action=()=>{
-  AppDataSource1.initialize().then(()=>{
-    alert ("heoeoeoeo")
-  }).catch((err)=>{
-    alert (err)
-  })
-}
+  const Action = () => {
+    AppDataSource1.initialize()
+      .then(() => {
+        alert('heoeoeoeo');
+        const entityManager = getManager();
+    // const connection = entityManager.connection;
+      })
+      .catch(err => {
+        alert(err);
+      });
+  };
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
   useEffect(() => {
     if (!initer) {
-      AppDataSource.initialize()
-        .then(() => {
-          setIniter(true);
-          // alert('Database initialized successfully!');
-        })
-        .catch(error => console.error('Error initializing database:', error));
+      Action();
       return () => {
-        AppDataSource.destroy();
+        AppDataSource1.destroy();
       };
     }
   }, []);
@@ -130,7 +130,7 @@ const Action=()=>{
   useEffect(() => {
     getPosts();
   }, [initer]);
-
+  
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar
@@ -205,14 +205,41 @@ const Action=()=>{
       <View>
         <Text>{JSON.stringify(posts)}</Text>
       </View>
-      <Button onPress={()=>{
+      <Button
+        onPress={async () => {
+          
+          try {
+            const studRepository = AppDataSource1.getRepository(Customer);
+          await studRepository.insert({
+            name: 'Student3aaaa',
+            
+          });
+          
+          const customers = await studRepository.find();
+          alert (JSON.stringify(customers))
 
-      Action()
-
-      }} title='Std'/>
+          } catch (error) {
+            alert (error)
+          }
+        }}
+        title="Initial , Craete"
+      />
+      <Button onPress={async()=>{
+            try {
+              const studRepository = AppDataSource1.getRepository(Customer);
+            //   const customer = await studRepository.findOne({ where: { id: 23 } });
+            // studRepository.remove(customer)
+            const customers = await studRepository.find();
+            alert (JSON.stringify(customers))
+            
+            alert ("JSON.stringify(customers)")
+            } catch (error) {
+              alert(error)
+            }
+      }} title='Delete'/>
     </SafeAreaView>
   );
-}//jesd
+} //jesd
 
 const styles = StyleSheet.create({
   sectionContainer: {

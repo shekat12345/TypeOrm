@@ -16,7 +16,7 @@ export class GenericRepository<T extends DataSource> {
     return this.repository.findOne({where: {id} as any});
   }
 
-  async findAll(relations: any): Promise<T[]> {
+  async findAll(relations?: any): Promise<T[]> {
     return this.repository.find(relations);
   }
 

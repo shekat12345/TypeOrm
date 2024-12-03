@@ -9,6 +9,8 @@ import axios from 'axios';
 import React, {useEffect, useState} from 'react';
 import type {PropsWithChildren} from 'react';
 import {Actionerr} from './tester.js';
+import {RunDb,destroyDb,HelloTest1,GetChatsOfNewSchema,GetMEssage,AddNewChatList,createChatWithMessagesWithTransActions,createChatWithMessagesNew,getChatsss,getChats,TestRepository,addChatWithMessagesAndFilesInTransaction,createChatWithMessages} from './ChatOrm/Database22.js';
+import {AppDataSourceChat} from './ChatOrm/Database22.js';
 import {
   Button,
   SafeAreaView,
@@ -34,7 +36,9 @@ import {Post} from './orrm/entities/Post';
 import {Erf} from './orrm/tutorials';
 import Student from './orrm/tutorials/entities/students.js';
 import {Customer} from './orrm/tutorials/entities/Cutsomer.ts';
-
+import { Chat } from './ChatOrm/entities/Chat.js';
+import { Message } from './ChatOrm/entities/Message.js';
+import {Test} from './Repository/Cmp.js'
 type SectionProps = PropsWithChildren<{
   title: string;
 }>;
@@ -92,151 +96,62 @@ function App(): React.JSX.Element {
   const [posts, setPosts] = useState([]);
   const [initer, setIniter] = useState(false);
 
-  const Action = () => {
-    AppDataSource1.initialize()
-      .then(() => {
-        alert('heoeoeoeo');
-        const entityManager = getManager();
-    // const connection = entityManager.connection;
-      })
-      .catch(err => {
-        alert(err);
-      });
-  };
+ 
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
-  useEffect(() => {
-    if (!initer) {
-      Action();
-      return () => {
-        AppDataSource1.destroy();
-      };
-    }
-  }, []);
-  const getPosts = async () => {
-    if (initer) {
-      try {
-        const postsRepo = AppDataSource.getRepository(Post);
-        const posts = await postsRepo.find();
-        setPosts(posts);
-        alert(JSON.stringify(posts));
-      } catch (error) {
-        alert(error);
-      }
-    }
-  };
-  useEffect(() => {
-    getPosts();
-  }, [initer]);
-  
+  // useEffect(() => {
+  //   if (!initer) {
+  //     RunDb();
+  //     return () => {
+  //       destroyDb();
+  //     };
+  //   }
+  // }, []);
+  //sxsx
+  return <Test/>
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor={backgroundStyle.backgroundColor}
       />
-      <Button
-        title="Get Authors "
-        onPress={async () => {
-          // axios
-          //   .post('http://192.168.10.53:3000/posts', {
-          //     title: 'My First Post',
-          //     content: 'This is the content of my first post.',
-          //     authorId: 1,
-          //   })
-          //   .then(response => {
-          //     alert(JSON.stringify(response.data));
-          //   })
-          //   .catch(error => {
-          //     alert(error.message); // Log the error message
-          //     console.error('Error details:', error.response?.data || error);
-          //   });
-
-          const authorRepo = AppDataSource.getRepository(Author);
-          const authors = await authorRepo.find();
-          // let erf = JSON.stringify(authorRepo)
-          console.log(authors);
-          // axios.get('http://192.168.10.53:3000/authors').then((e)=>{
-          //   alert (JSON.stringify(e))
-          // }).catch((er)=>{alert (er)})
-        }}
-      />
-      <Button
-        title="Get Posts"
-        onPress={async () => {
-          const authorRepo = AppDataSource.getRepository(Post);
-          const authors = await authorRepo.find();
-          // let erf = JSON.stringify(authorRepo)
-          console.log(authors);
-        }}
-      />
-      <Button
-        title="Create Post"
-        onPress={async () => {
+      
+         <Button title='Press to add' onPress={async()=>{
           try {
-            const postRepo = AppDataSource.getRepository(Post);
-            const newPost = postRepo.create({
-              title: 'hello',
-              content: 'hellll',
-              author: 1,
-            });
-            await postRepo.save(newPost);
-            alert('hello ');
-          } catch (error) {
-            alert(error);
-          }
-        }}
-      />
-      <Button
-        title="Create an Author "
-        onPress={async () => {
-          try {
-            const authorRepo = AppDataSource.getRepository(Author);
-            const newAuthor = authorRepo.create({name: 'user name 1'});
-            await authorRepo.save(newAuthor);
-            alert('hello ');
-          } catch (error) {
-            alert(error);
-          }
-        }}
-      />
-      <View>
-        <Text>{JSON.stringify(posts)}</Text>
-      </View>
-      <Button
-        onPress={async () => {
-          
-          try {
-            const studRepository = AppDataSource1.getRepository(Customer);
-          await studRepository.insert({
-            name: 'Student3aaaa',
+            HelloTest1()
+            const input = {
+              title: "General Chat",
+              messages: [{ content: "Hello, World!" }],
+              files: [
+                { message: "Hello, World!", url: "message_file.png" },
+                { url: "chat_file.png" },
+              ],
+            };
             
-          });
-          
-          const customers = await studRepository.find();
-          alert (JSON.stringify(customers))
-
           } catch (error) {
-            alert (error)
+            alert(error)
           }
-        }}
-        title="Initial , Craete"
-      />
-      <Button onPress={async()=>{
-            try {
-              const studRepository = AppDataSource1.getRepository(Customer);
-            //   const customer = await studRepository.findOne({ where: { id: 23 } });
-            // studRepository.remove(customer)
-            const customers = await studRepository.find();
-            alert (JSON.stringify(customers))
-            
-            alert ("JSON.stringify(customers)")
-            } catch (error) {
-              alert(error)
-            }
-      }} title='Delete'/>
+         }}/>
+         <Button title='Press to check' onPress={()=>{
+          // getChats()
+          addChatWithMessagesAndFilesInTransaction()
+          // createChatWithMessages()
+         }}/>
+         <Button title='Press to delete' onPress={()=>{
+          getChatsss()
+         }}/>
+         <Button title='Press to Test1' onPress={()=>{
+          alert (JSON.stringify(GetMEssage()))
+         }}/>
+         <Button title='Add New chatList' onPress={()=>{
+          // createChatWithMessagesNew()
+          createChatWithMessagesWithTransActions()
+         }}/>
+         <Button title='Get ChatLists' onPress={()=>{
+          GetChatsOfNewSchema()
+         }}/>
     </SafeAreaView>
   );
 } //jesd

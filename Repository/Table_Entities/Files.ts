@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, BaseEntity } from "typeorm";
-import { Chat } from "./Chat";
-import { Message } from "./Message";
+import { ChatList } from "./ChatList";
+import { Message } from "./Messages";
 
 @Entity()
 export class File extends BaseEntity {
@@ -10,8 +10,8 @@ export class File extends BaseEntity {
   @Column({type:"varchar"})
   url: string;
 
-  @ManyToOne(() => Chat, (chat) => chat.files, { nullable: true })
-  chat: Chat;
+  @ManyToOne(() => ChatList, (chat) => chat.files, { nullable: true })
+  chat: ChatList;
 
   @ManyToOne(() => Message, (message) => message.files, { nullable: true })
   message: Message;

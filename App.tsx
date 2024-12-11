@@ -10,6 +10,7 @@ import React, {useEffect, useState} from 'react';
 import type {PropsWithChildren} from 'react';
 import {Actionerr} from './tester.js';
 
+
 import {
   Button,
   SafeAreaView,
@@ -20,7 +21,7 @@ import {
   useColorScheme,
   View,
 } from 'react-native';
-import { getManager } from 'typeorm';
+import {getManager} from 'typeorm';
 import {
   Colors,
   DebugInstructions,
@@ -28,8 +29,12 @@ import {
   LearnMoreLinks,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
+import {countErrors} from './redux/reducers.js';
+import {store} from './redux/store.js';
 
-import {Test} from './Repository/Cmp.js'
+import {Test} from './Repository/Cmp.js';
+import {Provider} from 'react-redux';
+import {createStore} from '@reduxjs/toolkit';
 type SectionProps = PropsWithChildren<{
   title: string;
 }>;
@@ -43,56 +48,85 @@ function App(): React.JSX.Element {
   const [posts, setPosts] = useState([]);
   const [initer, setIniter] = useState(false);
 
- 
-
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
+  // useEffect(() => {
+  //   if (!initer) {
+  //     RunDb();
+  //     return () => {
+  //       destroyDb();
+  //     };
+  //   }
+  // }, []);
+  //sxsx
   
-  return <Test/>
-  // return (
-  //   <SafeAreaView style={backgroundStyle}>
-  //     <StatusBar
-  //       barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-  //       backgroundColor={backgroundStyle.backgroundColor}
-  //     />
-      
-  //        <Button title='Press to add' onPress={async()=>{
-  //         try {
-  //           HelloTest1()
-  //           const input = {
-  //             title: "General Chat",
-  //             messages: [{ content: "Hello, World!" }],
-  //             files: [
-  //               { message: "Hello, World!", url: "message_file.png" },
-  //               { url: "chat_file.png" },
-  //             ],
-  //           };
-            
-  //         } catch (error) {
-  //           alert(error)
-  //         }
-  //        }}/>
-  //        <Button title='Press to check' onPress={()=>{
-  //         // getChats()
-  //         addChatWithMessagesAndFilesInTransaction()
-  //         // createChatWithMessages()
-  //        }}/>
-  //        <Button title='Press to delete' onPress={()=>{
-  //         getChatsss()
-  //        }}/>
-  //        <Button title='Press to Test1' onPress={()=>{
-  //         alert (JSON.stringify(GetMEssage()))
-  //        }}/>
-  //        <Button title='Add New chatList' onPress={()=>{
-  //         // createChatWithMessagesNew()
-  //         createChatWithMessagesWithTransActions()
-  //        }}/>
-  //        <Button title='Get ChatLists' onPress={()=>{
-  //         GetChatsOfNewSchema()
-  //        }}/>
-  //   </SafeAreaView>
-  // );
+
+  return (
+    <Provider store={store}>
+      <Test />
+    </Provider>
+  );
+  return (
+    <SafeAreaView style={backgroundStyle}>
+      <StatusBar
+        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+        backgroundColor={backgroundStyle.backgroundColor}
+      />
+
+      <Button
+        title="Press to add"
+        onPress={async () => {
+          try {
+            HelloTest1();
+            const input = {
+              title: 'General Chat',
+              messages: [{content: 'Hello, World!'}],
+              files: [
+                {message: 'Hello, World!', url: 'message_file.png'},
+                {url: 'chat_file.png'},
+              ],
+            };
+          } catch (error) {
+            alert(error);
+          }
+        }}
+      />
+      <Button
+        title="Press to check"
+        onPress={() => {
+          // getChats()
+          addChatWithMessagesAndFilesInTransaction();
+          // createChatWithMessages()
+        }}
+      />
+      <Button
+        title="Press to delete"
+        onPress={() => {
+          getChatsss();
+        }}
+      />
+      <Button
+        title="Press to Test1"
+        onPress={() => {
+          alert(JSON.stringify(GetMEssage()));
+        }}
+      />
+      <Button
+        title="Add New chatList"
+        onPress={() => {
+          // createChatWithMessagesNew()
+          createChatWithMessagesWithTransActions();
+        }}
+      />
+      <Button
+        title="Get ChatLists"
+        onPress={() => {
+          GetChatsOfNewSchema();
+        }}
+      />
+    </SafeAreaView>
+  );
 } //jesd
 
 const styles = StyleSheet.create({
